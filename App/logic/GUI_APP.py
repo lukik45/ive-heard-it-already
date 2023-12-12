@@ -28,6 +28,7 @@ class SideMenuFrame(ctk.CTkFrame):
         print("start recording button clicked!")
 
     def stop_recording_button_clicked(self):
+        command_queue.get()
         print("stop recording button clicked!")
 
 class MainFrame(ctk.CTkFrame):
@@ -50,8 +51,9 @@ class WordFrame(ctk.CTkFrame):
         self.text_label = ctk.CTkLabel(self, text="", wraplength=200)
         self.text_label.grid(row=0, column=0, sticky="nsew")
 
-    def update_text_label(self, text):
-                self.text_label.configure(text=text)
+    def update_text_label(self, text_to_append):
+                current_text = self.text_label.cget("text")
+                self.text_label.configure(text=current_text + " " + text_to_append)
 
 
 

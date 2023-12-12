@@ -3,7 +3,7 @@ from interpreter import Interpreter
 
 
 def transcribe_audio(transcript_queue, command_queue):
-    transcriber = tr.VoskTranscriber() #fixme - possible issue due to the naming
+    transcriber = tr.VoskTranscriber(model_type='large') #fixme - possible issue due to the naming
     transcriber.transcribe(transcript_queue, command_queue)
 
 

@@ -10,3 +10,9 @@ class Phrase:
 
     def __init__(self, phrase):
         self.id = Phrase.get_next_id()
+
+
+class Word:
+    def __init__(self, word):
+        self.word = word
+        
