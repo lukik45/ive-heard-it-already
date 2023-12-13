@@ -10,6 +10,6 @@ def transcribe_audio(transcript_queue, command_queue):
 
 def interpret_transcript(transcript_queue, command_queue, words_queue):
     interpreter = Interpreter()
-    interpreter.interpret(transcript_queue, command_queue, words_queue)
+    interpreter.interpret_words(transcript_queue, command_queue, words_queue)
 
 

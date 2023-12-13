@@ -4,6 +4,7 @@ from threading import Thread
 import interface
 from time import sleep
 from test import test_all
+from word import Word
 
 
 transcript_queue = Queue()
@@ -11,18 +12,17 @@ words_queue = Queue()
 command_queue = Queue() # for multithread communication
 
 
-class SideMenuFrame(ctk.CTkFrame):
+class TopMenuFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=0)
 
-        self.start_recording_button = ctk.CTkButton(self, text="Start Recording", command=self.start_recording_button_clicked)
-        self.start_recording_button.grid(row=0, column=0)
+        self.start_recording_button = ctk.CTkButton(self, text="Start Recording", command=self.start_recording_button_clicked, width=20)
+        self.start_recording_button.pack(side='left')
 
-        self.stop_recording_button = ctk.CTkButton(self, text="Stop Recording", command=self.stop_recording_button_clicked)
-        self.stop_recording_button.grid(row=1, column=0)
-
+        self.stop_recording_button = ctk.CTkButton(self, text="Stop Recording", command=self.stop_recording_button_clicked, width=20)
+        self.stop_recording_button.pack(side='left')
 
     def start_recording_button_clicked(self):
         print("start recording button clicked!")
@@ -31,14 +31,6 @@ class SideMenuFrame(ctk.CTkFrame):
         command_queue.get()
         print("stop recording button clicked!")
 
-class MainFrame(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master)
-
-        self.grid_columnconfigure(0, weight=0)
-
-        self.transcript_label = ctk.CTkLabel(self, text="Hello, Tkinter!")
-        self.transcript_label.grid(row=0, column=0)
 
 
 class WordFrame(ctk.CTkFrame):
@@ -48,12 +40,29 @@ class WordFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.text_label = ctk.CTkLabel(self, text="", wraplength=200)
-        self.text_label.grid(row=0, column=0, sticky="nsew")
+        
+        self.canvas = ctk.CTkCanvas(self)
+        self.canvas.pack(side="top", fill="both", expand=True)
 
-    def update_text_label(self, text_to_append):
-                current_text = self.text_label.cget("text")
-                self.text_label.configure(text=current_text + " " + text_to_append)
+        self.scrollbar = ctk.CTkScrollbar(self, orientation="horizontal", command=self.canvas.xview)
+        self.scrollbar.pack(side="bottom", fill="x")
+
+        # configure the canvas to use the scrollbar
+        self.canvas.configure(xscrollcommand=self.scrollbar.set)
+
+        # create another frame inside the canvas to hold the buttons
+        self.button_frame = ctk.CTkFrame(self.canvas)
+        # add the button frame to a window in the canvas
+        self.canvas.create_window((0,0), window=self.button_frame, anchor="nw")
+        
+        # for i in range(20):
+        #     ctk.CTkButton(self.button_frame, text=f'Button {i+1}').pack(side='left')
+
+        self.button_frame.update()
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+        
+
 
 
 
@@ -61,34 +70,53 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.geometry("400x400")
+        self.geometry("800x300")
         self.title("I've heard it already!")
-        self.grid_columnconfigure(0, weight=0)
-        self.grid_rowconfigure(0, weight=0)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
-        self.side_menu = SideMenuFrame(self)
-        self.side_menu.grid(row=0, column=0, sticky="nsw")
-
-        self.main_frame = MainFrame(self)
-        self.main_frame.grid(row=0, column=1, sticky="nsew")
+        self.side_menu = TopMenuFrame(self)
+        self.side_menu.grid(row=0, column=0, sticky="new")
 
         self.word_frame = WordFrame(self)  
-        self.word_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        self.word_frame.grid(row=1, column=0, sticky="nsew")
 
     
 
 
-    def update_ui(self, ):
+    def update_ui(self ):
+        count=0
+        
         while not command_queue.empty():
             
             if not words_queue.empty():
+                
+                word_object: Word = words_queue.get()
+                word_button = ctk.CTkButton(self.word_frame.button_frame, 
+                                            text=word_object.text,
+                                            width=len(word_object.text),
+                                            # callback function
+                                            command=lambda: word_object.save_to_database())
+                
+                word_button.pack(side='left')
 
-                word = words_queue.get()
-                self.word_frame.update_text_label(word)
+                self.word_frame.button_frame.update()
+                self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
+                
+                # # update the scroll region
+                # self.word_frame.scrollable_frame.update()
+                # self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
+
+                # # pack the frame
+                # self.word_frame.scrollable_frame.pack(fill="both", expand=True)
+                count += 1
+                print(f"word added to the UI: {word_object.text}, {count} ")
+
+                
             sleep(0.05)
             
 
-
+        pass
 
 
 def main():

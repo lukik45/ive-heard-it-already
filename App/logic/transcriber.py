@@ -5,6 +5,7 @@ from queue import Queue
 from vosk import Model, KaldiRecognizer
 from metadata import *
 import json
+from _utils import *
 
 
 
@@ -12,10 +13,14 @@ class Transcriber(ABC):
     """Abstract class for transcribers"""
     def __init__(self):
         self.p = pyaudio.PyAudio()
+        # fixme: works only on this mac
+        
+
         self.stream = self.p.open(rate=SAMPLE_RATE,
                                   channels=CHANNELS,
                                   format=AUDIO_FORMAT,
                                   input=True,
+                                  input_device_index=get_input_device_index(self.p),
                                   frames_per_buffer=CHUNK_SIZE)
         self.stream.start_stream()
     
@@ -55,6 +60,7 @@ class VoskTranscriber(Transcriber):
     def transcribe(self, transcript_queue: Queue, command_queue: Queue):
         while not command_queue.empty(): # TODO: add a command to stop the transcription
             with open('partial.txt', 'a') as f:
+                print('processing')
                 
                 data = self.stream.read(CHUNK_SIZE, exception_on_overflow = False)
                 if len(data) == 0:
@@ -67,6 +73,7 @@ class VoskTranscriber(Transcriber):
                     partial_result = self.recognizer.PartialResult()
                     
                     f.write(partial_result)
+                    print('partial result: ', partial_result)
 
 
                     transcript_queue.put(partial_result)
