@@ -61,6 +61,9 @@ class WordFrame(ctk.CTkFrame):
         self.button_frame.update()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+        # scroll to the rightmost item
+        self.canvas.xview_moveto(1)
+
         
 
 
@@ -85,38 +88,42 @@ class App(ctk.CTk):
 
 
     def update_ui(self ):
-        count=0
-        
-        while not command_queue.empty():
+        try:
+            count=0
             
-            if not words_queue.empty():
+            while not command_queue.empty():
                 
-                word_object: Word = words_queue.get()
-                word_button = ctk.CTkButton(self.word_frame.button_frame, 
-                                            text=word_object.text,
-                                            width=len(word_object.text),
-                                            # callback function
-                                            command=lambda: word_object.save_to_database())
-                
-                word_button.pack(side='left')
+                if not words_queue.empty():
+                    
+                    word_object: Word = words_queue.get()
+                    word_button = ctk.CTkButton(self.word_frame.button_frame, 
+                                                text=word_object.text,
+                                                width=len(word_object.text),
+                                                # callback function
+                                                command=lambda: word_object.save_to_database())
+                    
+                    word_button.pack(side='left')
 
-                self.word_frame.button_frame.update()
-                self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
-                
-                # # update the scroll region
-                # self.word_frame.scrollable_frame.update()
-                # self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
+                    self.word_frame.button_frame.update()
+                    self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
 
-                # # pack the frame
-                # self.word_frame.scrollable_frame.pack(fill="both", expand=True)
-                count += 1
-                print(f"word added to the UI: {word_object.text}, {count} ")
+                    # scroll to the rightmostem
+                    self.word_frame.canvas.xview_moveto(1)
+                    
+                    # # update the scroll region
+                    # self.word_frame.scrollable_frame.update()
+                    # self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
 
-                
-            sleep(0.05)
-            
+                    # # pack the frame
+                    # self.word_frame.scrollable_frame.pack(fill="both", expand=True)
+                    count += 1
+                    print(f"word added to the UI: {word_object.text}, {count} ")
 
-        pass
+                    
+                # sleep(0.05) nie ma spania!
+        except Exception as e: 
+            print(e)
+
 
 
 def main():

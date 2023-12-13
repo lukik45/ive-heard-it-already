@@ -64,10 +64,13 @@ class VoskTranscriber(Transcriber):
                 
                 data = self.stream.read(CHUNK_SIZE, exception_on_overflow = False)
                 if len(data) == 0:
+                    print('no data----------------------------------')
                     break
                 if self.recognizer.AcceptWaveform(data):
-                    # result = self.recognizer.Result()
+                    result = self.recognizer.Result()
                     # transcript_queue.put(result)
+                    # print('accept waveform---------------------------')
+                    # print('result: ', result)
                     continue
                 else:
                     partial_result = self.recognizer.PartialResult()
