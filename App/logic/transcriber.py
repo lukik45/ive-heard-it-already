@@ -60,7 +60,6 @@ class VoskTranscriber(Transcriber):
     def transcribe(self, transcript_queue: Queue, command_queue: Queue):
         while not command_queue.empty(): # TODO: add a command to stop the transcription
             with open('partial.txt', 'a') as f:
-                print('processing')
                 
                 data = self.stream.read(CHUNK_SIZE, exception_on_overflow = False)
                 if len(data) == 0:
@@ -74,11 +73,6 @@ class VoskTranscriber(Transcriber):
                     continue
                 else:
                     partial_result = self.recognizer.PartialResult()
-                    
-                    f.write(partial_result)
-                    print('partial result: ', partial_result)
-
-
                     transcript_queue.put(partial_result)
             # final_result = self.recognizer.FinalResult()
             # transcript_queue.put(final_result)

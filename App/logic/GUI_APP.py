@@ -32,7 +32,6 @@ class TopMenuFrame(ctk.CTkFrame):
         print("stop recording button clicked!")
 
 
-
 class WordFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -54,19 +53,12 @@ class WordFrame(ctk.CTkFrame):
         self.button_frame = ctk.CTkFrame(self.canvas)
         # add the button frame to a window in the canvas
         self.canvas.create_window((0,0), window=self.button_frame, anchor="nw")
-        
-        # for i in range(20):
-        #     ctk.CTkButton(self.button_frame, text=f'Button {i+1}').pack(side='left')
 
         self.button_frame.update()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
         # scroll to the rightmost item
         self.canvas.xview_moveto(1)
-
-        
-
-
 
 
 class App(ctk.CTk):
@@ -85,16 +77,10 @@ class App(ctk.CTk):
         self.word_frame.grid(row=1, column=0, sticky="nsew")
 
     
-
-
     def update_ui(self ):
         try:
-            count=0
-            
-            while not command_queue.empty():
-                
-                if not words_queue.empty():
-                    
+            while not command_queue.empty():             
+                if not words_queue.empty():                 
                     word_object: Word = words_queue.get()
                     word_button = ctk.CTkButton(self.word_frame.button_frame, 
                                                 text=word_object.text,
@@ -109,26 +95,13 @@ class App(ctk.CTk):
 
                     # scroll to the rightmostem
                     self.word_frame.canvas.xview_moveto(1)
-                    
-                    # # update the scroll region
-                    # self.word_frame.scrollable_frame.update()
-                    # self.word_frame.canvas.configure(scrollregion=self.word_frame.canvas.bbox("all"))
 
-                    # # pack the frame
-                    # self.word_frame.scrollable_frame.pack(fill="both", expand=True)
-                    count += 1
-                    print(f"word added to the UI: {word_object.text}, {count} ")
-
-                    
-                # sleep(0.05) nie ma spania!
         except Exception as e: 
             print(e)
 
 
-
 def main():
     test_all()
-
 
     app = App()
 
@@ -144,12 +117,8 @@ def main():
     ui_thread = Thread(target=app.update_ui) # words_queue already accesible
     ui_thread.start()
 
-
-
-
-
-
     app.mainloop()
+
 
 if __name__ == "__main__":
     main()

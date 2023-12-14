@@ -27,13 +27,10 @@ class Interpreter:
                 else: # if no changes were made to the transcript
                     continue
                     
-                for word in new_words:
-                    # words_queue.put(word["word"])
-                    
+                for word in new_words:     
                     # create a new word object
                     word_object = Word(word["word"], word["start"], word["end"])
                     words_queue.put(word_object)
-                    print(word["word"])
                     last_transcript_length += 1
 
             except KeyError: # if the transcript is final or text?
